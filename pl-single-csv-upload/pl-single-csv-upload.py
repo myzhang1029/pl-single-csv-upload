@@ -29,6 +29,11 @@ def get_answer_name(column_names: str) -> str:
         hashlib.sha1(column_names.encode("utf-8")).hexdigest()
     )
 
+# Generate a unique key for each column name
+def get_column_key(column_name: str, answer_name: str) -> str:
+    b64 = base64.b64encode(column_name.encode()).decode()
+    return f"single_csv_upload_col_{answer_name}_{b64}"
+
 
 def prepare(element_html: str, data: pl.QuestionData) -> None:
     element = lxml.html.fragment_fromstring(element_html)
@@ -50,14 +55,15 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     uuid = pl.get_uuid()
 
     raw_column_names = pl.get_string_attrib(element, "column-names", "")
-    column_names = sorted(get_clist_as_array(raw_column_names))
+    column_names = get_clist_as_array(raw_column_names)
     column_names_json = json.dumps(column_names, allow_nan=False)
+    column_names_rich = [{"col_text": name, "col_key": get_column_key(name, answer_name)} for name in column_names]
 
     answer_name = get_answer_name(raw_column_names)
 
     html_params = {
         "name": answer_name,
-        "column_names": column_names,
+        "column_names": column_names_rich,
         "column_names_json": column_names_json,
         "uuid": uuid,
         "editable": data["editable"],
@@ -94,9 +100,8 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     # Convert the column names to a dictionary for easy access
     column_names = get_clist_as_array(raw_column_names)
     data["submitted_answers"]["column_names"] = {}
-    for idx, wanted_name in enumerate(column_names):
-        # Generated in `pl-single-csv-upload.mustache`
-        pl_html_name = f"single_csv_upload_col_{answer_name}_{idx}"
+    for wanted_name in column_names:
+        pl_html_name = get_column_key(wanted_name, answer_name)
         user_supplied_name = data["submitted_answers"][pl_html_name]
         data["submitted_answers"]["column_names"][wanted_name] = user_supplied_name
         del data["submitted_answers"][pl_html_name]
