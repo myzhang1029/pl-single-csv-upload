@@ -32,8 +32,10 @@
           return done();
         },
         addedfile: (file) => {
-          this.addFileFromBlob(file, false);
+          this.addFileFromBlob(file);
         },
+        acceptedFiles: 'text/csv,text/plain,.csv',
+        maxFiles: 1,
       });
 
       this.renderColList();
@@ -44,10 +46,10 @@
      * @type {[type]}
      */
     syncFilesToHiddenInput() {
-      this.element.find('input').val(JSON.stringify(this.file));
+      this.element.find('input.single-csv-upload-data').val(JSON.stringify(this.file));
     }
 
-    addFileFromBlob(blob, isFromDownload) {
+    addFileFromBlob(blob) {
       var reader = new FileReader();
       reader.onload = (e) => {
         var dataUrl = e.target.result;
@@ -64,13 +66,11 @@
         this.syncFilesToHiddenInput();
         this.renderColList();
 
-        if (!isFromDownload) {
-          // Ensure that students see a prompt if they try to navigate away
-          // from the page without saving the form. This check is initially
-          // disabled because we don't want students to see the prompt if they
-          // haven't actually made any changes.
-          this.element.find('input').removeAttr('data-disable-unload-check');
-        }
+        // Ensure that students see a prompt if they try to navigate away
+        // from the page without saving the form. This check is initially
+        // disabled because we don't want students to see the prompt if they
+        // haven't actually made any changes.
+        this.element.find('input.single-csv-upload-data').removeAttr('data-disable-unload-check');
       };
 
       reader.readAsDataURL(blob);
@@ -106,6 +106,7 @@
         var base64ColName = window.btoa(colName);
         $input.attr('name', 'single_csv_upload_col_' + this.answerName + '_' + base64ColName);
         $input.attr('placeholder', colName);
+        $input.attr('class', 'single-csv-upload-col-selection');
         $col.append($input);
         $colList.append($col);
       });

@@ -8,7 +8,7 @@ $(() => {
 </script>
 
 <div id="single-csv-upload-{{uuid}}" {{#submission_files_url}}data-submission-files-url="{{submission_files_url}}"{{/submission_files_url}}>
-  <input type="hidden" name="{{name}}" data-skip-unload-check="true">
+  <input type="hidden" name="{{name}}" class="single-csv-upload-data" data-skip-unload-check="true">
   {{#editable}}
   <div class="upload-dropzone d-flex align-items-center justify-content-center p-3 mb-3 rounded">
     <div class="text-center dz-message">
@@ -16,7 +16,7 @@ $(() => {
       <br/>
       <small>You may only upload one file. Extra files will be ignored.</small>
       <br/>
-      <small>The combined size limit of all uploaded files is 5MB.</small>
+      <small>File size limit is 5MB.</small>
     </div>
   </div>
   {{/editable}}
