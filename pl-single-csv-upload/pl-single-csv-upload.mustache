@@ -2,7 +2,7 @@
 $(() => {
   new window.PLSingleCsvUpload("{{uuid}}", {
     requiredColumns: {{&column_names}},
-    submittedFileName: {{&submitted_file_name}},
+    //submittedFileName: {{&submitted_file_name}},
     checkIconColor: "{{check_icon_color}}",
   });
 });
@@ -24,6 +24,7 @@ $(() => {
   <div class="messages">
   </div>
   <div class="single-csv-upload-status" style="margin-top: 1ex;">
+    <div id="single-csv-upload-download-link-area-{{uuid}}" ></div>
     <div class="card mb-4">
       <div class="card-header">Columns</div>
       <ul class="list-group list-group-flush">

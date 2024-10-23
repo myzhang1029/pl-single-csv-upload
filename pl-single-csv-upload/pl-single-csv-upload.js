@@ -24,51 +24,11 @@
         throw new Error('CSV upload element ' + elementId + ' was not found!');
       }
 
-      if (options.submittedFileNames) {
-        this.downloadExistingFiles(options.submittedFileNames).then(() => {
-          this.syncFilesToHiddenInput();
-        });
-      }
-
       this.checkIconColor = options.checkIconColor;
 
       // We need to render after we start loading the existing files so that we
       // can pick up the right values from `pendingFileDownloads`.
       this.initializeTemplate();
-    }
-
-    async downloadExistingFiles(fileNames) {
-      const submissionFilesUrl = this.element.data('submission-files-url');
-      fileNames.forEach((file) => this.pendingFileDownloads.add(file));
-
-      await Promise.all(
-        fileNames.map(async (file) => {
-          const escapedFileName = escapePath(file);
-          const path = `${submissionFilesUrl}/${escapedFileName}`;
-          try {
-            const res = await fetch(path, { method: 'GET' });
-            if (!res.ok) {
-              throw new Error(`Failed to download file: ${res.status}`);
-            }
-            if (!res) {
-              this.pendingFileDownloads.delete(file);
-              this.failedFileDownloads.add(file);
-              this.renderFileList();
-              return;
-            }
-
-            // Avoid race condition with student initiated upload. If the student
-            // added a file while this was loading, the file name would have been
-            // removed from the list of pending downloads, so we can just ignore
-            // the result.
-            if (this.pendingFileDownloads.has(file)) {
-              this.addFileFromBlob(file, await res.blob(), true);
-            }
-          } catch (e) {
-            console.error(e);
-          }
-        }),
-      );
     }
 
     /**
@@ -106,7 +66,7 @@
         },
       });
 
-      this.renderFileList();
+      this.renderColList();
     }
 
     /**
@@ -134,7 +94,7 @@
         // Store the file as base-64 encoded data
         var base64FileData = dataUrl.substring(commaSplitIdx + 1);
         this.saveSubmittedFile(name, base64FileData);
-        this.renderFileList();
+        this.renderColList();
 
         if (!isFromDownload) {
           // Show the preview for the newly-uploaded file
@@ -183,34 +143,20 @@
     }
 
     /**
-     * Generates markup to show the status of the uploaded files, including
-     * previews of files as appropriate.
+     * Generates markup to show the status of required columns
      */
-    renderFileList() {
-      var $fileList = this.element.find('.file-upload-status .card ul.list-group');
+    renderColList() {
+      var $colList = this.element.find('.single-csv-upload-status .card ul.list-group');
 
-      // Save which cards are currently expanded
-      var expandedFiles = [];
-      $fileList.children().each(function () {
-        var fileName = $(this).attr('data-file');
-        if (fileName && $(this).find('.file-preview').hasClass('show')) {
-          expandedFiles.push(fileName);
-        }
-      });
-
-      $fileList.html('');
+      $colList.html('');
 
       var uuid = this.uuid;
 
       this.acceptedFiles.forEach((fileName, index) => {
-        var isExpanded = expandedFiles.includes(fileName);
         var fileData = this.getSubmittedFileContents(fileName);
 
         var $file = $('<li class="list-group-item" data-file="' + fileName + '"></li>');
         var $fileStatusContainer = $('<div class="file-status-container d-flex flex-row"></div>');
-        if (fileData) {
-          $fileStatusContainer.addClass('has-preview');
-        }
         $file.append($fileStatusContainer);
         var $fileStatusContainerLeft = $('<div class="flex-grow-1"></div>');
         $fileStatusContainer.append($fileStatusContainerLeft);
@@ -253,68 +199,6 @@
             fileData +
             '">Download</a>';
 
-          var $preview = $(
-            '<div class="file-preview collapse" id="file-preview-' +
-              uuid +
-              '-' +
-              index +
-              '"></div>',
-          );
-
-          var $error = $('<div class="alert alert-danger mt-2 d-none" role="alert"></div>');
-          $preview.append($error);
-
-          var $imgPreview = $('<img class="mw-100 mt-2 d-none"/>');
-          $preview.append($imgPreview);
-
-          var $codePreview = $(
-            '<pre class="bg-dark text-white rounded p-3 mt-2 mb-0 d-none"><code></code></pre>',
-          );
-          $preview.append($codePreview);
-
-          if (isExpanded) {
-            $preview.addClass('show');
-          }
-
-          try {
-            if (this.isPdf(fileData)) {
-              const url = this.b64ToBlobUrl(fileData, { type: 'application/pdf' });
-              const $objectPreview = $(
-                `<div class="mt-2 embed-responsive embed-responsive-4by3">
-                   <iframe class="embed-responsive-item" src="${url}">
-                     PDF file cannot be displayed.
-                   </iframe>
-                 </div>`,
-              );
-              $objectPreview.find('iframe').on('load', () => {
-                URL.revokeObjectURL(url);
-              });
-              $preview.append($objectPreview);
-            } else {
-              var fileContents = this.b64DecodeUnicode(fileData);
-              if (!this.isBinary(fileContents)) {
-                $preview.find('code').text(fileContents);
-              } else {
-                $preview.find('code').text('Binary file not previewed.');
-              }
-              $codePreview.removeClass('d-none');
-            }
-          } catch {
-            const url = this.b64ToBlobUrl(fileData);
-            $imgPreview
-              .on('load', () => {
-                $imgPreview.removeClass('d-none');
-                URL.revokeObjectURL(url);
-              })
-              .on('error', () => {
-                $error
-                  .text('Content preview is not available for this type of file.')
-                  .removeClass('d-none');
-                URL.revokeObjectURL(url);
-              })
-              .attr('src', url);
-          }
-          $file.append($preview);
           $fileStatusContainer.append(
             '<div class="align-self-center">' +
               download +
@@ -325,7 +209,7 @@
           );
         }
 
-        $fileList.append($file);
+        $colList.append($file);
       });
     }
 
@@ -339,31 +223,19 @@
 
     /**
      * Checks if the given file contents should be treated as binary or
-     * text. Uses the same method as git: if the first 8000 bytes contain a
+     * text. Uses the same method as git: if the file contains a
      * NUL character ('\0'), we consider the file to be binary.
      * http://stackoverflow.com/questions/6119956/how-to-determine-if-git-handles-a-file-as-binary-or-as-text
      * @param  {String}  decodedFileContents File contents to check
      * @return {Boolean}                     If the file is recognized as binary
      */
     isBinary(decodedFileContents) {
+      // Maiyun: the original code makes no sense. git skips after 8000 bytes
+      // because it's a performance optimization to not read the entire file.
+      // But we're already reading the entire file, so we can just check for
+      // the presence of a NUL character anywhere in the file.
       var nulIdx = decodedFileContents.indexOf('\0');
-      var fileLength = decodedFileContents.length;
-      return nulIdx !== -1 && nulIdx <= (fileLength <= 8000 ? fileLength : 8000);
-    }
-
-    /**
-     * Checks if the given file contents should be interpreted as a PDF file.
-     * Using the magic numbers from the `file` utility command:
-     * https://github.com/file/file/blob/master/magic/Magdir/pdf
-     * The signatures are converted to base64 for comparison, to avoid issues
-     * with converting from base64 to binary.
-     */
-    isPdf(base64FileData) {
-      return (
-        base64FileData.match(/^JVBERi[0-3]/) || // "%PDF-"
-        base64FileData.match(/^CiVQREYt/) || // "\x0a%PDF-"
-        base64FileData.match(/^77u\/JVBERi[0-3]/) // "\xef\xbb\xbf%PDF-"
-      );
+      return nulIdx !== -1;
     }
 
     /**
