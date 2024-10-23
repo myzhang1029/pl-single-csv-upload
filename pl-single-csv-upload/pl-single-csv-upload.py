@@ -1,3 +1,4 @@
+import base64
 import csv
 import hashlib
 import json
@@ -72,13 +73,11 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 def parse(element_html: str, data: pl.QuestionData) -> None:
     element = lxml.html.fragment_fromstring(element_html)
     raw_column_names = pl.get_string_attrib(element, "column-names", "")
-    required_column_names = get_clist_as_array(raw_column_names)
     answer_name = get_answer_name(raw_column_names)
-    raise Exception(f"answers: {data['submitted_answers'].keys()}")
 
     # Get submitted answer or return parse_error if it does not exist
-    files = data["submitted_answers"].get(answer_name, None)
-    if not files:
+    file_content = data["submitted_answers"].get(answer_name, None)
+    if not file_content:
         add_format_error(data, "No submitted answer for single CSV upload.")
         return
 
@@ -88,26 +87,48 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     del data["submitted_answers"][answer_name]
 
     try:
-        parsed_files = json.loads(files)
+        parsed_b64_payload = json.loads(file_content)
     except Exception:
         add_format_error(data, "Could not parse submitted files.")
-        parsed_files = []
+        parsed_b64_payload = None
 
-    for x in parsed_files:
-        # Filter out any files that were not listed in file_names
-        if x.get("name", "") in required_column_names:
-            pl.add_submitted_file(data, x.get("name", ""), x.get("contents", ""))
+    pl.add_submitted_file(data, pl.get_uuid() + ".csv", parsed_b64_payload)
 
-    # Validate that all required files are present
-    if parsed_files is not None:
-        submitted_file_names = [x.get("name", "") for x in parsed_files]
-        missing_files = [
-            x for x in required_file_names if x not in submitted_file_names
-        ]
+    # Convert the column names to a dictionary for easy access
+    column_names = get_clist_as_array(raw_column_names)
+    data["submitted_answers"]["column_names"] = {}
+    for wanted_name in column_names:
+        # Generated in `pl-single-csv-upload.js::renderColList`
+        base64_colname = base64.b64encode(wanted_name.encode("utf-8")).decode("utf-8")
+        uuid = pl.get_uuid()
+        pl_html_name = f"single_csv_upload_col_{uuid}_{base64_colname}"
+        user_supplied_name = data["submitted_answers"][pl_html_name]
+        data["submitted_answers"]["column_names"][wanted_name] = user_supplied_name
+        del data["submitted_answers"][pl_html_name]
 
-        if len(missing_files) > 0:
+    # Test-parse the CSV file to check for missing columns
+    if parsed_b64_payload is not None:
+        user_specified_colnames = set(data["submitted_answers"]["column_names"].values())
+        if len(user_specified_colnames) != len(column_names):
             add_format_error(
                 data,
-                "The following required files were missing: "
-                + ", ".join(missing_files),
+                "Some columns have duplicate names. Please ensure that each column has a unique name.",
+            )
+            return
+        contents = base64.b64decode(parsed_b64_payload).decode("utf-8")
+        reader = csv.reader(
+            StringIO(contents),
+            delimiter=",",
+            escapechar="\\",
+            quoting=csv.QUOTE_NONE,
+            skipinitialspace=True,
+            strict=True,
+        )
+        header = next(reader)
+        missing_columns = set(column_names) - set(header)
+        if len(missing_columns) > 0:
+            add_format_error(
+                data,
+                "The following columns are missing from the uploaded CSV file: "
+                + ", ".join(missing_columns),
             )
