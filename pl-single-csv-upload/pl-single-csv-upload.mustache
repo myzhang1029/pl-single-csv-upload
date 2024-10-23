@@ -1,0 +1,33 @@
+<script>
+$(() => {
+  new window.PLSingleCsvUpload("{{uuid}}", {
+    requiredColumns: {{&column_names}},
+    submittedFileName: {{&submitted_file_name}},
+    checkIconColor: "{{check_icon_color}}",
+  });
+});
+</script>
+
+<div id="single-csv-upload-{{uuid}}" {{#submission_files_url}}data-submission-files-url="{{submission_files_url}}"{{/submission_files_url}}>
+  <input type="hidden" name="{{name}}" data-skip-unload-check="true">
+  {{#editable}}
+  <div class="upload-dropzone d-flex align-items-center justify-content-center p-3 mb-3 rounded">
+    <div class="text-center dz-message">
+      Please drop one CSV file into the box below, or click to select a file to upload.
+      <br/>
+      <small>You may only upload one file. Extra files will be ignored.</small>
+      <br/>
+      <small>The combined size limit of all uploaded files is 5MB.</small>
+    </div>
+  </div>
+  {{/editable}}
+  <div class="messages">
+  </div>
+  <div class="single-csv-upload-status" style="margin-top: 1ex;">
+    <div class="card mb-4">
+      <div class="card-header">Columns</div>
+      <ul class="list-group list-group-flush">
+      </ul>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,8 @@
+{
+  "controller": "pl-single-csv-upload.py",
+  "dependencies": {
+    "nodeModulesScripts": ["lodash/lodash.min.js", "dropzone/dist/dropzone.js"],
+    "elementScripts": ["pl-single-csv-upload.js"],
+    "elementStyles": ["pl-single-csv-upload.css"]
+  }
+}
