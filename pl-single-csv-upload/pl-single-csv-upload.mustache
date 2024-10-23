@@ -32,7 +32,7 @@ $(() => {
           <span class="input-group-prepend">
             <span class="input-group-text">{{.}}</span>
           </span>
-          <input type="text" class="form-control single-csv-upload-col-selection" name="single_csv_upload_col_{{name}}_{{@index}}">
+          <input type="text" class="form-control single-csv-upload-col-selection" name="single_csv_upload_col_{{name}}_{{index}}" placeholder="{{.}}">
         </li>
         {{/column_names}}
       </ul>
