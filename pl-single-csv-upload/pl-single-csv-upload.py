@@ -100,8 +100,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     for wanted_name in column_names:
         # Generated in `pl-single-csv-upload.js::renderColList`
         base64_colname = base64.b64encode(wanted_name.encode("utf-8")).decode("utf-8")
-        uuid = pl.get_uuid()
-        pl_html_name = f"single_csv_upload_col_{uuid}_{base64_colname}"
+        pl_html_name = f"single_csv_upload_col_{answer_name}_{base64_colname}"
         user_supplied_name = data["submitted_answers"][pl_html_name]
         data["submitted_answers"]["column_names"][wanted_name] = user_supplied_name
         del data["submitted_answers"][pl_html_name]
