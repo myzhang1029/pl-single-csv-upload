@@ -30,10 +30,6 @@ def get_answer_name(column_names: str) -> str:
     )
 
 
-def add_format_error(data: pl.QuestionData, error_string: str) -> None:
-    pl.add_files_format_error(data, error_string)
-
-
 def prepare(element_html: str, data: pl.QuestionData) -> None:
     element = lxml.html.fragment_fromstring(element_html)
     required_attribs = ["column-names"]
@@ -78,7 +74,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     # Get submitted answer or return parse_error if it does not exist
     file_content = data["submitted_answers"].get(answer_name, None)
     if not file_content:
-        add_format_error(data, "No submitted answer for single CSV upload.")
+        pl.add_files_format_error(data, "No submitted answer for single CSV upload.")
         return
 
     # We will store the files in the submitted_answer["_files"] key,
@@ -89,7 +85,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     try:
         parsed_b64_payload = json.loads(file_content)
     except Exception:
-        add_format_error(data, "Could not parse submitted files.")
+        pl.add_files_format_error(data, "Could not parse submitted files.")
         parsed_b64_payload = None
 
     pl.add_submitted_file(data, pl.get_uuid() + ".csv", parsed_b64_payload)
@@ -97,10 +93,9 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     # Convert the column names to a dictionary for easy access
     column_names = get_clist_as_array(raw_column_names)
     data["submitted_answers"]["column_names"] = {}
-    for wanted_name in column_names:
-        # Generated in `pl-single-csv-upload.js::renderColList`
-        base64_colname = base64.b64encode(wanted_name.encode("utf-8")).decode("utf-8")
-        pl_html_name = f"single_csv_upload_col_{answer_name}_{base64_colname}"
+    for idx, wanted_name in enumerate(column_names):
+        # Generated in `pl-single-csv-upload.mustache`
+        pl_html_name = f"single_csv_upload_col_{answer_name}_{idx}"
         user_supplied_name = data["submitted_answers"][pl_html_name]
         data["submitted_answers"]["column_names"][wanted_name] = user_supplied_name
         del data["submitted_answers"][pl_html_name]
@@ -109,7 +104,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     if parsed_b64_payload is not None:
         user_specified_colnames = set(data["submitted_answers"]["column_names"].values())
         if len(user_specified_colnames) != len(column_names):
-            add_format_error(
+            pl.add_files_format_error(
                 data,
                 "Some columns have duplicate names. Please ensure that each column has a unique name.",
             )
@@ -126,7 +121,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
         header = next(reader)
         missing_columns = set(column_names) - set(header)
         if len(missing_columns) > 0:
-            add_format_error(
+            pl.add_files_format_error(
                 data,
                 "The following columns are missing from the uploaded CSV file: "
                 + ", ".join(missing_columns),

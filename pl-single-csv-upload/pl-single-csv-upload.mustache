@@ -27,6 +27,14 @@ $(() => {
     <div class="card mb-4">
       <div class="card-header">Match Your Columns Names:</div>
       <ul class="list-group list-group-flush">
+        {{#column_names}}
+        <li class="list-group-item">
+          <span class="input-group-prepend">
+            <span class="input-group-text">{{.}}</span>
+          </span>
+          <input type="text" class="form-control single-csv-upload-col-selection" name="single_csv_upload_col_{{name}}_{{@index}}">
+        </li>
+        {{/column_names}}
       </ul>
     </div>
   </div>
