@@ -55,11 +55,10 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     uuid = pl.get_uuid()
 
     raw_column_names = pl.get_string_attrib(element, "column-names", "")
+    answer_name = get_answer_name(raw_column_names)
     column_names = get_clist_as_array(raw_column_names)
     column_names_json = json.dumps(column_names, allow_nan=False)
     column_names_rich = [{"col_text": name, "col_key": get_column_key(name, answer_name)} for name in column_names]
-
-    answer_name = get_answer_name(raw_column_names)
 
     html_params = {
         "name": answer_name,
