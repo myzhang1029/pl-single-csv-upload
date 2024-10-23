@@ -22,21 +22,9 @@
   color: #999;
 }
 
-[id^='single-csv-upload'] .file-preview-button::before {
-  content: 'Show preview';
-}
-
-[id^='single-csv-upload'] .file-preview-button:not(.collapsed)::before {
-  content: 'Hide preview';
-}
-
 [id^='single-csv-upload'] .file-preview-icon {
   margin-left: 10px;
   transition: transform 400ms;
-}
-
-[id^='single-csv-upload'] .file-preview-button:not(.collapsed) .file-preview-icon {
-  transform: rotateX(180deg);
 }
 
 [id^='single-csv-upload'] .file-preview pre {

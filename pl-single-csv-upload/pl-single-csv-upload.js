@@ -85,14 +85,7 @@
           '<a download="student-uploaded.csv" class="btn btn-outline-secondary btn-sm mr-1" href="data:application/octet-stream;base64,' +
           this.file +
           '">Download</a>';
-        $downloadArea.append(
-          '<div class="align-self-center">' +
-            download +
-            `<button type="button" class="btn btn-outline-secondary btn-sm file-preview-button data-toggle="collapse" data-target="#file-preview-${uuid}-" aria-controls="file-preview-${uuid}">` +
-            '<span class="file-preview-icon fa fa-angle-down"></span>' +
-            '</button>' +
-            '</div>',
-        );
+        $downloadArea.append(download);
       }
 
       var $colList = this.element.find('.single-csv-upload-status .card ul.list-group');
@@ -101,10 +94,15 @@
 
       var uuid = this.uuid;
       this.requiredColumns.forEach((colName) => {
-        // Placeholder for the column status
+        // Make a text input for each required column
         var $col = $('<li class="list-group-item"></li>');
-        $col.append('<span class="col-name">' + colName + '</span>');
-        $col.append('<span class="col-status"></span>');
+        var $label = $('<label></label>');
+        $label.text(colName);
+        $col.append($label);
+        var $input = $('<input type="text" class="form-control" />');
+        $input.attr('name', '_single_csv_upload_col_' + uuid + '_' + colName);
+        $input.attr('placeholder', colName);
+        $col.append($input);
         $colList.append($col);
       });
     }
