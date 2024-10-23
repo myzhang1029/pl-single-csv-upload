@@ -57,7 +57,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
     html_params = {
         "name": answer_name,
-        "column_names": column_names_json,
+        "column_names": column_names,
+        "column_names_json": column_names_json,
         "uuid": uuid,
         "editable": data["editable"],
     }
