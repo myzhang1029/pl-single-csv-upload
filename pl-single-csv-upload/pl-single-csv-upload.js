@@ -7,13 +7,11 @@
       this.file = null;
       this.requiredColumns = options.requiredColumns || [];
 
-      const elementId = '#csv-upload-' + uuid;
+      const elementId = '#single-csv-upload-' + uuid;
       this.element = $(elementId);
       if (!this.element) {
         throw new Error('CSV upload element ' + elementId + ' was not found!');
       }
-
-      this.checkIconColor = options.checkIconColor;
 
       // We need to render after we start loading the existing files so that we
       // can pick up the right values from `pendingFileDownloads`.
