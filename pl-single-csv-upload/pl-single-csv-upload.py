@@ -58,25 +58,11 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
     answer_name = get_answer_name(raw_column_names)
 
-    # Only send the file names to the client. We don't include the contents
-    # to avoid bloating the HTML. The client will fetch any submitted files
-    # asynchronously once the page loads.
-    #
-    # We filter out any files that weren't specified in the file names for this element.
-    submitted_files = data["submitted_answers"].get("_files", [])
-    submitted_file_names = list(
-        {x.get("name") for x in submitted_files} & set(column_names)
-    )
-    submitted_file_names_json = json.dumps(submitted_file_names, allow_nan=False)
-
     html_params = {
         "name": answer_name,
         "column_names": column_names_json,
         "uuid": uuid,
         "editable": data["editable"],
-        "submission_file_url": data["options"].get("submission_file_url", None),
-        "submitted_file_names": submitted_file_names_json,
-        "check_icon_color": PLColor("correct_green"),
     }
 
     with open("pl-single-csv-upload.mustache", "r", encoding="utf-8") as f:
@@ -88,11 +74,12 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     raw_column_names = pl.get_string_attrib(element, "column-names", "")
     required_column_names = get_clist_as_array(raw_column_names)
     answer_name = get_answer_name(raw_column_names)
+    raise Exception(f"answers: {data['submitted_answers']}")
 
     # Get submitted answer or return parse_error if it does not exist
     files = data["submitted_answers"].get(answer_name, None)
     if not files:
-        add_format_error(data, "No submitted answer for file upload.")
+        add_format_error(data, "No submitted answer for single CSV upload.")
         return
 
     # We will store the files in the submitted_answer["_files"] key,
