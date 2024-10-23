@@ -108,7 +108,6 @@
         var base64ColName = window.btoa(colName);
         $input.attr('name', 'single_csv_upload_col_' + this.answerName + '_' + base64ColName);
         $input.attr('placeholder', colName);
-        $input.attr('required', true);
         $col.append($input);
         $colList.append($col);
       });
