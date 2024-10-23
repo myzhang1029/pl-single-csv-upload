@@ -74,7 +74,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     raw_column_names = pl.get_string_attrib(element, "column-names", "")
     required_column_names = get_clist_as_array(raw_column_names)
     answer_name = get_answer_name(raw_column_names)
-    raise Exception(f"answers: {data['submitted_answers']}")
+    raise Exception(f"answers: {data['submitted_answers'].keys()}")
 
     # Get submitted answer or return parse_error if it does not exist
     files = data["submitted_answers"].get(answer_name, None)
