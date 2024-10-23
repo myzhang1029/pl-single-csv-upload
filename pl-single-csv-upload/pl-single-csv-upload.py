@@ -32,7 +32,7 @@ def get_answer_name(column_names: str) -> str:
 # Generate a unique key for each column name
 def get_column_key(column_name: str, answer_name: str) -> str:
     b64 = base64.b64encode(column_name.encode()).decode()
-    return f"single_csv_upload_col_{answer_name}_{b64}"
+    return f"{answer_name}_col_{b64}"
 
 
 def prepare(element_html: str, data: pl.QuestionData) -> None:
