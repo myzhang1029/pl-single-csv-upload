@@ -30,17 +30,19 @@ $(() => {
       <ul class="list-group list-group-flush">
         {{#column_names}}
         <li class="list-group-item">
-          <div class="input-group-prepend">
+          <div class="input-group">
             <span class="input-group-text">{{col_text}}: </span>
-            <select
-              name="{{col_key}}"
-              id="single-csv-upload-select-{{uuid}}-{{col_key}}"
-              class="single-csv-upload-select"
-              {{^editable}}disabled{{/editable}}
-              aria-label="Column names for {{col_text}}"
-            >
-              <option value="{{uuid}}-placeholder" disabled selected data-content="{{uuid}}-placeholder"></option>
-            </select>
+            <div class="form-control">
+              <select
+                name="{{col_key}}"
+                id="single-csv-upload-select-{{uuid}}-{{col_key}}"
+                class="single-csv-upload-select"
+                {{^editable}}disabled{{/editable}}
+                aria-label="Column names for {{col_text}}"
+              >
+                <option value="{{uuid}}-placeholder" disabled selected data-content="{{uuid}}-placeholder"></option>
+              </select>
+            </div>
           </div>
         </li>
         {{/column_names}}
