@@ -32,10 +32,11 @@ $(() => {
         <li class="list-group-item">
           <div class="input-group single-csv-upload-select-group">
             <span class="input-group-text">{{col_text}}: </span>
-            <div class="form-control">
+            <div class="form-control ts-control">
               <select
                 name="{{col_key}}"
                 id="single-csv-upload-select-{{uuid}}-{{col_key}}"
+                class="form-select"
                 {{^editable}}disabled{{/editable}}
                 aria-label="Column names for {{col_text}}"
               >
