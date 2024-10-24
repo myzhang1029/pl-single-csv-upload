@@ -31,16 +31,16 @@ $(() => {
         {{#column_names}}
         <li class="list-group-item">
           <div class="input-group single-csv-upload-select-group">
-            <span class="input-group-text">{{col_text}}: </span>
-              <select
-                name="{{col_key}}"
-                id="single-csv-upload-select-{{uuid}}-{{col_key}}"
-                class="form-select"
-                {{^editable}}disabled{{/editable}}
-                aria-label="Column names for {{col_text}}"
-              >
-                <option value="{{uuid}}-placeholder" disabled selected data-content="{{uuid}}-placeholder"></option>
-              </select>
+            <span class="input-group-text"> {{col_text}} </span>
+            <select
+              name="{{col_key}}"
+              id="single-csv-upload-select-{{uuid}}-{{col_key}}"
+              class="form-select"
+              {{^editable}}disabled{{/editable}}
+              aria-label="Column names for {{col_text}}"
+            >
+              <option value="{{uuid}}-placeholder" disabled selected data-content="{{uuid}}-placeholder"></option>
+            </select>
           </div>
         </li>
         {{/column_names}}
