@@ -10,14 +10,3 @@
   background-color: #d9edf7;
   border-style: solid;
 }
-
-.single-csv-upload-select-group .form-control {
-  cursor: pointer !important;
-
-  /** https://github.com/orchidjs/tom-select/issues/757 */
-  padding-right: 2.5rem !important;
-}
-
-.single-csv-upload-select-group .form-control select {
-  height: 100%;
-}
