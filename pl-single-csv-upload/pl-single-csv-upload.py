@@ -83,26 +83,21 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     if not file_content:
         pl.add_files_format_error(data, "No submitted answer for single CSV upload.")
         return
-
-    # We will store the files in the submitted_answer["_files"] key,
-    # so delete the original submitted answer format to avoid
-    # duplication
+    # Move the file content to a user-friendly key
     del data["submitted_answers"][answer_name]
-
     try:
         parsed_b64_payload = json.loads(file_content)
     except Exception:
         # Probably due to malicious user input
         pl.add_files_format_error(data, "Could not parse submitted files.")
         parsed_b64_payload = ""
-
-    pl.add_submitted_file(data, file_name, parsed_b64_payload)
+    data["submitted_answers"][file_name] = parsed_b64_payload
 
     # Convert the column names to a dictionary for easy access
     column_names = get_clist_as_array(raw_column_names)
-    data["submitted_answers"]["column_names"] = {}
+    data["submitted_answers"][file_name + "_column_names"] = {}
     for wanted_name in column_names:
         pl_html_name = get_column_key(wanted_name, answer_name)
         user_supplied_name = data["submitted_answers"][pl_html_name]
-        data["submitted_answers"]["column_names"][wanted_name] = user_supplied_name
+        data["submitted_answers"][file_name + "_column_names"][wanted_name] = user_supplied_name
         del data["submitted_answers"][pl_html_name]
