@@ -98,6 +98,6 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     data["submitted_answers"][file_name + "_column_names"] = {}
     for wanted_name in column_names:
         pl_html_name = get_column_key(wanted_name, answer_name)
-        user_supplied_name = data["submitted_answers"][pl_html_name]
+        user_supplied_name = data["submitted_answers"][pl_html_name] or wanted_name
         data["submitted_answers"][file_name + "_column_names"][wanted_name] = user_supplied_name
         del data["submitted_answers"][pl_html_name]
