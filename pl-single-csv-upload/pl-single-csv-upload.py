@@ -29,8 +29,8 @@ def get_answer_name(file_name: str) -> str:
 
 # Generate a unique key for each column name
 def get_column_key(column_name: str, answer_name: str) -> str:
-    b64 = base64.b64encode(column_name.encode()).decode()
-    return f"{answer_name}_col_{b64}"
+    encoded = base64.b16encode(column_name.encode()).decode()
+    return f"{answer_name}_col_{encoded}"
 
 
 def prepare(element_html: str, data: pl.QuestionData) -> None:
