@@ -7,7 +7,6 @@ from io import StringIO
 import chevron
 import lxml.html
 import prairielearn as pl
-from colors import PLColor
 
 
 def get_clist_as_array(raw_clist_names: str) -> list[str]:
@@ -23,11 +22,10 @@ def get_clist_as_array(raw_clist_names: str) -> list[str]:
 
 
 # Each pl-single-csv-upload element is uniquely identified by the SHA1 hash of its
-# column_names attribute
-def get_answer_name(column_names: str) -> str:
-    return "_single_csv_upload_{0}".format(
-        hashlib.sha1(column_names.encode("utf-8")).hexdigest()
-    )
+# file_name attribute
+def get_answer_name(file_name: str) -> str:
+    hashname = hashlib.sha1(file_name.encode("utf-8")).hexdigest()
+    return f"_single_csv_upload_{hashname}"
 
 # Generate a unique key for each column name
 def get_column_key(column_name: str, answer_name: str) -> str:
@@ -37,7 +35,7 @@ def get_column_key(column_name: str, answer_name: str) -> str:
 
 def prepare(element_html: str, data: pl.QuestionData) -> None:
     element = lxml.html.fragment_fromstring(element_html)
-    required_attribs = ["column-names"]
+    required_attribs = ["column-names", "file-name"]
     optional_attribs = []
     pl.check_attribs(element, required_attribs, optional_attribs)
 
@@ -55,7 +53,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     uuid = pl.get_uuid()
 
     raw_column_names = pl.get_string_attrib(element, "column-names", "")
-    answer_name = get_answer_name(raw_column_names)
+    file_name = pl.get_string_attrib(element, "file-name", "")
+    answer_name = get_answer_name(file_name)
     column_names = get_clist_as_array(raw_column_names)
     column_names_json = json.dumps(column_names, allow_nan=False)
     column_names_rich = [{"col_text": name, "col_key": get_column_key(name, answer_name)} for name in column_names]
@@ -75,7 +74,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 def parse(element_html: str, data: pl.QuestionData) -> None:
     element = lxml.html.fragment_fromstring(element_html)
     raw_column_names = pl.get_string_attrib(element, "column-names", "")
-    answer_name = get_answer_name(raw_column_names)
+    file_name = pl.get_string_attrib(element, "file-name", "")
+    answer_name = get_answer_name(file_name)
 
     # Get submitted answer or return parse_error if it does not exist
     file_content = data["submitted_answers"].get(answer_name, None)
@@ -91,10 +91,11 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     try:
         parsed_b64_payload = json.loads(file_content)
     except Exception:
+        # Probably due to malicious user input
         pl.add_files_format_error(data, "Could not parse submitted files.")
-        parsed_b64_payload = None
+        parsed_b64_payload = ""
 
-    pl.add_submitted_file(data, pl.get_uuid() + ".csv", parsed_b64_payload)
+    pl.add_submitted_file(data, file_name, parsed_b64_payload)
 
     # Convert the column names to a dictionary for easy access
     column_names = get_clist_as_array(raw_column_names)
@@ -104,30 +105,3 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
         user_supplied_name = data["submitted_answers"][pl_html_name]
         data["submitted_answers"]["column_names"][wanted_name] = user_supplied_name
         del data["submitted_answers"][pl_html_name]
-
-    # Test-parse the CSV file to check for missing columns
-    if parsed_b64_payload is not None:
-        user_specified_colnames = set(data["submitted_answers"]["column_names"].values())
-        if len(user_specified_colnames) != len(column_names):
-            pl.add_files_format_error(
-                data,
-                "Some columns have duplicate names. Please ensure that each column has a unique name.",
-            )
-            return
-        contents = base64.b64decode(parsed_b64_payload).decode("utf-8")
-        reader = csv.reader(
-            StringIO(contents),
-            delimiter=",",
-            escapechar="\\",
-            quoting=csv.QUOTE_NONE,
-            skipinitialspace=True,
-            strict=True,
-        )
-        header = next(reader)
-        missing_columns = set(column_names) - set(header)
-        if len(missing_columns) > 0:
-            pl.add_files_format_error(
-                data,
-                "The following columns are missing from the uploaded CSV file: "
-                + ", ".join(missing_columns),
-            )
