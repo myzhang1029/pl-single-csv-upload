@@ -66,6 +66,7 @@
         this.file = base64FileData;
         this.syncFilesToHiddenInput();
         this.renderDownloadButton();
+        this.renderColumnTable();
 
         // Ensure that students see a prompt if they try to navigate away
         // from the page without saving the form. This check is initially
@@ -87,6 +88,16 @@
           this.file +
           '">Download</a>';
         $downloadArea.html(download);
+      }
+    }
+
+    renderColumnTable() {
+      if (this.file) {
+        var rawcontent = atob(this.file);
+        var parsed = parse(rawcontent, { to: 1 });
+        console.log(parsed);
+      } else {
+        // TODO
       }
     }
 
