@@ -97,7 +97,14 @@
         var parsed = csv_parse_sync.parse(rawcontent, { to: 1 });
         // The first record should be the header row
         var header_col_names = parsed[0];
-
+        var $col_selects = this.element.find('.single-csv-upload-select-group select');
+        $col_selects.empty();
+        for (var i = 0; i < header_col_names.length; i++) {
+          var $option = $('<option></option>');
+          $option.attr('value', header_col_names[i]);
+          $option.text(header_col_names[i]);
+          $col_selects.append($option);
+        }
       } else {
         // TODO
       }
