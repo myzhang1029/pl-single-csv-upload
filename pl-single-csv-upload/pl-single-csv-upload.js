@@ -94,7 +94,7 @@
     renderColumnTable() {
       if (this.file) {
         var rawcontent = atob(this.file);
-        var parsed = parse(rawcontent, { to: 1 });
+        var parsed = csv_parse_sync.parse(rawcontent, { to: 1 });
         console.log(parsed);
       } else {
         // TODO
