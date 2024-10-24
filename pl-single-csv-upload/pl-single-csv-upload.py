@@ -58,12 +58,22 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     column_names = get_clist_as_array(raw_column_names)
     column_names_json = json.dumps(column_names, allow_nan=False)
     column_names_rich = [{"col_text": name, "col_key": get_column_key(name, answer_name)} for name in column_names]
+    # This is for restoring the user's original submission during editing
+    # Should be a string of base64 data, but JSON just to be safe
+    old_submission = json.dumps(data["submitted_answers"].get(file_name, None), allow_nan=False)
+    # A dictionary of column names to user-supplied names
+    old_column_assignments = data["submitted_answers"].get(file_name + "_column_names", None)
+    # Transform it to {col-key: user-supplied-name}
+    if old_column_assignments:
+        old_column_assignments = {get_column_key(k, answer_name): v for k, v in old_column_assignments.items()}
 
     html_params = {
         "name": answer_name,
         "file_name": file_name,
         "column_names": column_names_rich,
         "column_names_json": column_names_json,
+        "old_submission_json": old_submission,
+        "old_column_assignments_json": old_column_assignments,
         "uuid": uuid,
         "editable": data["editable"],
     }

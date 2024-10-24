@@ -15,15 +15,6 @@
         throw new Error('CSV upload element ' + elementId + ' was not found!');
       }
 
-      // We need to render after we start loading the existing files so that we
-      // can pick up the right values from `pendingFileDownloads`.
-      this.initializeTemplate();
-    }
-
-    /**
-     * Initializes the file upload zone on the question.
-     */
-    initializeTemplate() {
       const $dropTarget = this.element.find('.upload-dropzone');
 
       $dropTarget.dropzone({
@@ -39,6 +30,9 @@
         maxFiles: 1,
       });
 
+      if (options.oldSubmission && options.oldSubmission.length > 0 && options.oldColumnAssignments) {
+        this.fillOldSubmissionContent(options.oldSubmission, options.oldColumnAssignments);
+      }
       this.renderDownloadButton();
     }
 
@@ -48,6 +42,17 @@
      */
     syncFilesToHiddenInput() {
       this.element.find('input.single-csv-upload-data').val(JSON.stringify(this.file));
+    }
+
+    fillOldSubmissionContent(oldSubmission, oldColumnAssignments) {
+      this.file = oldSubmission;
+      this.syncFilesToHiddenInput();
+      this.renderColumnTable();
+      // Make sure to do this after renderColumnTable, or
+      // all the select elements will be removed
+      for (var key in oldColumnAssignments) {
+        this.element.find('#single-csv-upload-select-' + this.uuid + '-' + key).val(oldColumnAssignments[key]);
+      }
     }
 
     addFileFromBlob(blob) {
@@ -105,8 +110,6 @@
           $option.text(header_col_names[i]);
           $col_selects.append($option);
         }
-      } else {
-        // TODO
       }
     }
 
