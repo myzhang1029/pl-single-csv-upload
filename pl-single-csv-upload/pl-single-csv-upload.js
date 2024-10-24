@@ -95,7 +95,9 @@
       if (this.file) {
         var rawcontent = atob(this.file);
         var parsed = csv_parse_sync.parse(rawcontent, { to: 1 });
-        console.log(parsed);
+        // The first record should be the header row
+        var header_col_names = parsed[0];
+
       } else {
         // TODO
       }

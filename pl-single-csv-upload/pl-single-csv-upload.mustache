@@ -33,7 +33,15 @@ $(() => {
           <span class="input-group-prepend">
             <span class="input-group-text">{{col_text}}</span>
           </span>
-          <input type="text" class="form-control single-csv-upload-col-selection" name="{{col_key}}" placeholder="{{col_text}}">
+          <select
+            name="{{col_key}}"
+            id="single-csv-upload-select-{{uuid}}-{{col_key}}"
+            class="d-inline-flex"
+            {{^editable}}disabled{{/editable}}
+            aria-label="Multiple choice options"
+          >
+            <option value="{{uuid}}-placeholder" disabled selected data-content="{{uuid}}-placeholder"></option>
+          </select>
         </li>
         {{/column_names}}
       </ul>
