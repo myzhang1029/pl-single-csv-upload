@@ -5,8 +5,9 @@
     constructor(uuid, options) {
       this.uuid = uuid;
       this.file = null;
-      this.requiredColumns = options.requiredColumns || [];
+      this.requiredColumns = options.requiredColumns;
       this.answerName = options.answerName;
+      this.fileName = options.fileName;
 
       const elementId = '#single-csv-upload-' + uuid;
       this.element = $(elementId);
@@ -80,7 +81,9 @@
       if (this.file) {
         var $downloadArea = this.element.find('#single-csv-upload-download-link-area-' + this.uuid);
         var download =
-          '<a download="student-uploaded.csv" class="btn btn-outline-secondary btn-sm mr-1" href="data:application/octet-stream;base64,' +
+          '<a download="' +
+          this.fileName +
+          '" class="btn btn-outline-secondary btn-sm mr-1" href="data:application/octet-stream;base64,' +
           this.file +
           '">Download</a>';
         $downloadArea.html(download);

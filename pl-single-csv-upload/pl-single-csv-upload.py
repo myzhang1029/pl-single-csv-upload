@@ -52,8 +52,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     element = lxml.html.fragment_fromstring(element_html)
     uuid = pl.get_uuid()
 
-    raw_column_names = pl.get_string_attrib(element, "column-names", "")
-    file_name = pl.get_string_attrib(element, "file-name", "")
+    raw_column_names = pl.get_string_attrib(element, "column-names")
+    file_name = pl.get_string_attrib(element, "file-name")
     answer_name = get_answer_name(file_name)
     column_names = get_clist_as_array(raw_column_names)
     column_names_json = json.dumps(column_names, allow_nan=False)
@@ -61,6 +61,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
     html_params = {
         "name": answer_name,
+        "file_name": file_name,
         "column_names": column_names_rich,
         "column_names_json": column_names_json,
         "uuid": uuid,
@@ -73,8 +74,8 @@ def render(element_html: str, data: pl.QuestionData) -> str:
 
 def parse(element_html: str, data: pl.QuestionData) -> None:
     element = lxml.html.fragment_fromstring(element_html)
-    raw_column_names = pl.get_string_attrib(element, "column-names", "")
-    file_name = pl.get_string_attrib(element, "file-name", "")
+    raw_column_names = pl.get_string_attrib(element, "column-names")
+    file_name = pl.get_string_attrib(element, "file-name")
     answer_name = get_answer_name(file_name)
 
     # Get submitted answer or return parse_error if it does not exist
