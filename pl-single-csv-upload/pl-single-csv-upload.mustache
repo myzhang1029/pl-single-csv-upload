@@ -36,7 +36,7 @@ $(() => {
             <span class="input-group-text"> {{col_text}} </span>
             <select
               name="{{col_key}}"
-              id="single-csv-upload-select-{{uuid}}-{{col_key}}"
+              id="{{col_key}}-select"
               class="form-select"
               {{^editable}}disabled{{/editable}}
               aria-label="Column names for {{col_text}}"

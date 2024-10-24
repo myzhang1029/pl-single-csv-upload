@@ -64,8 +64,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     # A dictionary of column names to user-supplied names
     old_column_assignments = data["submitted_answers"].get(file_name + "_column_names", {})
     # Transform it to {col-key: user-supplied-name}
-    if old_column_assignments:
-        old_column_assignments = {get_column_key(k, answer_name): v for k, v in old_column_assignments.items()}
+    old_column_assignments = {get_column_key(k, answer_name): v for k, v in old_column_assignments.items()}
     old_column_assignments_json = json.dumps(old_column_assignments, allow_nan=False)
 
     html_params = {

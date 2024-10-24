@@ -51,7 +51,7 @@
       // Make sure to do this after renderColumnTable, or
       // all the select elements will be removed
       for (var key in oldColumnAssignments) {
-        this.element.find('#single-csv-upload-select-' + this.uuid + '-' + key).val(oldColumnAssignments[key]);
+        this.element.find('#' + key + '-select').val(oldColumnAssignments[key]);
       }
     }
 
