@@ -98,7 +98,12 @@
 
     renderColumnTable() {
       if (this.file) {
-        var rawcontent = atob(this.file);
+        // https://stackoverflow.com/a/30106551
+        var rawcontent = decodeURIComponent(
+          atob(this.file).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join('')
+        );
         var parsed = csv_parse_sync.parse(rawcontent, {
             // e.g. Capstone always makes BOMful CSVs, so we leave this on
             bom: true,
