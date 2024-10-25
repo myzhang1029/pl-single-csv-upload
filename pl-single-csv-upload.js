@@ -99,7 +99,14 @@
     renderColumnTable() {
       if (this.file) {
         var rawcontent = atob(this.file);
-        var parsed = csv_parse_sync.parse(rawcontent, { to: 1 });
+        var parsed = csv_parse_sync.parse(rawcontent, {
+            // e.g. Capstone always makes BOMful CSVs, so we leave this on
+            bom: true,
+            // We want to get the header row directly, so don't parse them for us
+            columns: false,
+            // Keep only the first row
+            to: 1
+        });
         // The first record should be the header row
         var header_col_names = parsed[0];
         var $col_selects = this.element.find('.single-csv-upload-select-group select');
