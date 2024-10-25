@@ -95,13 +95,17 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
         return
     # Move the file content to a user-friendly key
     del data["submitted_answers"][answer_name]
-    data["submitted_answers"][file_name] = file_content
+    data["submitted_answers"][file_name] = {}
+    data["submitted_answers"][file_name]["content"] = file_content
 
     # Convert the column names to a dictionary for easy access
-    column_names = get_clist_as_array(raw_column_names)
-    data["submitted_answers"][file_name + "_column_names"] = {}
-    for wanted_name in column_names:
+    wanted_names = get_clist_as_array(raw_column_names)
+    data["submitted_answers"][file_name]["column_names"] = {}
+    for wanted_name in wanted_names:
         pl_html_name = get_column_key(wanted_name, answer_name)
-        user_supplied_name = data["submitted_answers"][pl_html_name] or wanted_name
-        data["submitted_answers"][file_name + "_column_names"][wanted_name] = user_supplied_name
+        if pl_html_name not in data["submitted_answers"]:
+            pl.add_files_format_error(data, f"Column not selected for {wanted_name}")
+            continue
+        user_supplied_name = data["submitted_answers"][pl_html_name]
+        data["submitted_answers"][file_name]["column_names"][wanted_name] = user_supplied_name
         del data["submitted_answers"][pl_html_name]
