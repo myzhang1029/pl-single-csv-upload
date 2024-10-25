@@ -25,28 +25,26 @@ $(() => {
   {{/editable}}
   <div class="messages">
   </div>
-  <div class="single-csv-upload-status" style="margin-top: 1ex;">
-    <div id="single-csv-upload-download-link-area-{{uuid}}" class="align-self-center"></div>
-    <div class="card mb-4">
-      <div class="card-header">Match Your Columns Names:</div>
-      <ul class="list-group list-group-flush">
-        {{#column_names}}
-        <li class="list-group-item">
-          <div class="input-group single-csv-upload-select-group">
-            <span class="input-group-text"> {{col_text}} </span>
-            <select
-              name="{{col_key}}"
-              id="{{col_key}}-select"
-              class="form-select"
-              {{^editable}}disabled{{/editable}}
-              aria-label="Column names for {{col_text}}"
-            >
-              <option value="{{uuid}}-placeholder" disabled selected data-content="{{uuid}}-placeholder">Upload something first</option>
-            </select>
-          </div>
-        </li>
-        {{/column_names}}
-      </ul>
-    </div>
+  <div class="card mb-4 single-csv-upload-status">
+    <div class="card-header">Match column names</div>
+    <ul class="list-group list-group-flush">
+      {{#column_names}}
+      <li class="list-group-item">
+        <div class="input-group single-csv-upload-select-group">
+          <span class="input-group-text"> {{col_text}} </span>
+          <select
+            name="{{col_key}}"
+            id="{{col_key}}-select"
+            class="form-select"
+            {{^editable}}disabled{{/editable}}
+            aria-label="Column names for {{col_text}}"
+          >
+            <option value="{{uuid}}-placeholder" disabled selected data-content="{{uuid}}-placeholder">Upload something first</option>
+          </select>
+        </div>
+      </li>
+      {{/column_names}}
+    </ul>
+    <div class="card-footer d-flex" id="single-csv-upload-download-link-area-{{uuid}}"></div>
   </div>
 </div>

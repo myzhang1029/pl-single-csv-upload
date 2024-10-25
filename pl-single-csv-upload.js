@@ -86,13 +86,11 @@
     renderDownloadButton() {
       if (this.file) {
         var $downloadArea = this.element.find('#single-csv-upload-download-link-area-' + this.uuid);
-        var download =
-          '<a download="' +
-          this.fileName +
-          '" class="btn btn-outline-secondary btn-sm mr-1" href="data:application/octet-stream;base64,' +
-          this.file +
-          '">Download</a>';
-        $downloadArea.html(download);
+        var $download = $('<a class="btn btn-outline-secondary btn-sm ms-auto"></a>');
+        $download.attr('download', this.fileName);
+        $download.attr('href', 'data:application/octet-stream;base64,' + this.file);
+        $download.text('Download your submission');
+        $downloadArea.html($download);
       }
     }
 
@@ -116,6 +114,7 @@
         var header_col_names = parsed[0];
         var $col_selects = this.element.find('.single-csv-upload-select-group select');
         $col_selects.empty();
+        $col_selects.append('<option value="" disabled selected hidden>Select a column...</option>');
         for (var i = 0; i < header_col_names.length; i++) {
           var $option = $('<option></option>');
           $option.attr('value', header_col_names[i]);
