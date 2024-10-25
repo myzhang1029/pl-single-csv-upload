@@ -95,13 +95,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
         return
     # Move the file content to a user-friendly key
     del data["submitted_answers"][answer_name]
-    try:
-        parsed_b64_payload = json.loads(file_content)
-    except Exception:
-        # Probably due to malicious user input
-        pl.add_files_format_error(data, "Could not parse submitted files.")
-        parsed_b64_payload = ""
-    data["submitted_answers"][file_name] = parsed_b64_payload
+    data["submitted_answers"][file_name] = file_content
 
     # Convert the column names to a dictionary for easy access
     column_names = get_clist_as_array(raw_column_names)

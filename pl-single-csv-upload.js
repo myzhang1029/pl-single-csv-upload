@@ -41,7 +41,7 @@
      * @type {[type]}
      */
     syncFilesToHiddenInput() {
-      this.element.find('input.single-csv-upload-data').val(JSON.stringify(this.file));
+      this.element.find('input.single-csv-upload-data').val(this.file);
     }
 
     fillOldSubmissionContent(oldSubmission, oldColumnAssignments) {
