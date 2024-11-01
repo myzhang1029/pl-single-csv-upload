@@ -33,11 +33,6 @@ def prepare(element_html: str, data: pl.QuestionData) -> None:
     optional_attribs = []
     pl.check_attribs(element, required_attribs, optional_attribs)
 
-    if "_required_column_names" not in data["params"]:
-        data["params"]["_required_column_names"] = []
-    column_names = get_clist_as_array(pl.get_string_attrib(element, "column-names"))
-    data["params"]["_required_column_names"].extend(column_names)
-
 
 def render(element_html: str, data: pl.QuestionData) -> str:
     if data["panel"] != "question":
