@@ -2,7 +2,6 @@
 $(() => {
   new window.PLSingleCsvUpload("{{uuid}}", {
     requiredColumns: {{&column_names_json}},
-    answerName: "{{name}}",
     fileName: "{{file_name}}",
     oldSubmission: {{&old_submission_json}},
     oldColumnAssignments: {{&old_column_assignments_json}},
@@ -11,7 +10,7 @@ $(() => {
 </script>
 
 <div id="single-csv-upload-{{uuid}}" {{#submission_files_url}}data-submission-files-url="{{submission_files_url}}"{{/submission_files_url}}>
-  <input type="hidden" name="{{name}}" class="single-csv-upload-data" data-skip-unload-check="true">
+  <input type="hidden" name="{{file_name}}" class="single-csv-upload-data" data-skip-unload-check="true">
   {{#editable}}
   <div class="upload-dropzone d-flex align-items-center justify-content-center p-3 mb-3 rounded">
     <div class="text-center dz-message">

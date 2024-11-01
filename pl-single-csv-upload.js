@@ -6,7 +6,6 @@
       this.uuid = uuid;
       this.file = null;
       this.requiredColumns = options.requiredColumns;
-      this.answerName = options.answerName;
       this.fileName = options.fileName;
 
       const elementId = '#single-csv-upload-' + uuid;
