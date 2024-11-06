@@ -3,7 +3,7 @@ $(() => {
   new window.PLSingleCsvUpload("{{uuid}}", {
     requiredColumns: {{&column_names_json}},
     fileName: "{{file_name}}",
-    oldSubmission: {{&old_submission_json}},
+    oldSubmission: "{{old_submission}}",
     oldColumnAssignments: {{&old_column_assignments_json}},
   });
 });

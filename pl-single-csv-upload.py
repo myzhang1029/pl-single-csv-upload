@@ -47,10 +47,10 @@ def render(element_html: str, data: pl.QuestionData) -> str:
     column_names_json = json.dumps(column_names, allow_nan=False)
     column_names_rich = [{"col_text": name, "col_key": get_column_key(name, file_name)} for name in column_names]
     # This is for restoring the user's original submission during editing
-    # Should be a string of base64 data, but JSON just to be safe
-    old_submission = json.dumps(data["submitted_answers"].get(file_name, None), allow_nan=False)
+    old_submission = data["submitted_answers"].get(file_name, None)
+    old_submission_content = old_submission.get("content", None) if old_submission else None
     # A dictionary of column names to user-supplied names
-    old_column_assignments = data["submitted_answers"].get(file_name + "_column_names", {})
+    old_column_assignments = old_submission.get("column_names", {}) if old_submission else {}
     # Transform it to {col-key: user-supplied-name}
     old_column_assignments = {get_column_key(k, file_name): v for k, v in old_column_assignments.items()}
     old_column_assignments_json = json.dumps(old_column_assignments, allow_nan=False)
@@ -59,7 +59,7 @@ def render(element_html: str, data: pl.QuestionData) -> str:
         "file_name": file_name,
         "column_names": column_names_rich,
         "column_names_json": column_names_json,
-        "old_submission_json": old_submission,
+        "old_submission": old_submission_content,
         "old_column_assignments_json": old_column_assignments_json,
         "uuid": uuid,
         "editable": data["editable"],
