@@ -19,9 +19,6 @@
       $dropTarget.dropzone({
         url: '/none',
         autoProcessQueue: false,
-        accept: (_file, done) => {
-          return done();
-        },
         addedfile: (file) => {
           this.addFileFromBlob(file);
         },
