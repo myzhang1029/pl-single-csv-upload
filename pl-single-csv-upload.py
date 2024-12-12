@@ -75,18 +75,23 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     file_name = pl.get_string_attrib(element, "file-name")
 
     # Get submitted answer or return parse_error if it does not exist
-    file_content = data["submitted_answers"].get(file_name, None)
-    if not file_content:
-        pl.add_files_format_error(data, "No submitted answer for single CSV upload")
-        return
+    # The HTML/JS interface has no distinction between empty and non-existent
+    # submissions, so we do not distinguish between them here either
+    file_content = data["submitted_answers"].get(file_name, "")
     # Move the file content to a user-friendly key
     del data["submitted_answers"][file_name]
     data["submitted_answers"][file_name] = {}
+    if not file_content:
+        pl.add_files_format_error(data, "No submitted answer for single CSV upload")
+        # So if `data["submitted_answers"][file_name] == {}`, the question author can
+        # be sure that we processed everything correctly but there was no submission
+        # or the submission was empty
+        return
     data["submitted_answers"][file_name]["content"] = file_content
+    data["submitted_answers"][file_name]["column_names"] = {}
 
     # Convert the column names to a dictionary for easy access
     wanted_names = get_clist_as_array(raw_column_names)
-    data["submitted_answers"][file_name]["column_names"] = {}
     for wanted_name in wanted_names:
         pl_html_name = get_column_key(wanted_name, file_name)
         if pl_html_name not in data["submitted_answers"]:

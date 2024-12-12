@@ -28,21 +28,17 @@ from io import BytesIO
 import pandas as pd
 
 def filter_csv_submission(data, file_name: str, required_column_names: list[str]) -> pd.DataFrame | str:
-    if file_name not in data["submitted_answers"]:
-        # The student didn't submit a CSV file
-        return "You didn't submit a CSV file."
+    if file_name not in data["submitted_answers"] or not data["submitted_answers"][file_name]:
+        return "You didn't submit a CSV file"
     submitted_file = data["submitted_answers"][file_name]
-    if "column_names" not in submitted_file:
-        specified_column_names = {}
-    else:
-        specified_column_names = submitted_file["column_names"]
+    specified_column_names = submitted_file["column_names"]
     raw_data_file = BytesIO(base64.b64decode(submitted_file["content"]))
     raw_data = pd.read_csv(raw_data_file)
     student_column_names = [specified_column_names[name] if name in specified_column_names else name for name in required_column_names]
     missing_columns = [name for name in student_column_names if name not in raw_data.columns]
     if missing_columns:
         # Some of the specified columns are missing
-        return f"Your CSV file is missing the following columns: {missing_columns}."
+        return f"Your CSV file is missing the following columns: {missing_columns}"
     new_dataframe = raw_data[student_column_names]
     # Rename to our names
     new_dataframe.columns = required_column_names
