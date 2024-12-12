@@ -77,7 +77,7 @@ def parse(element_html: str, data: pl.QuestionData) -> None:
     # Get submitted answer or return parse_error if it does not exist
     file_content = data["submitted_answers"].get(file_name, None)
     if not file_content:
-        pl.add_files_format_error(data, "No submitted answer for single CSV upload.")
+        pl.add_files_format_error(data, "No submitted answer for single CSV upload")
         return
     # Move the file content to a user-friendly key
     del data["submitted_answers"][file_name]
